@@ -7,8 +7,12 @@ jobs:
     steps:
       - name: Clean Workspace
         run: rm -rf workspace/app
+        
       - name: Clone Repository
         run: git clone https://github.com/Sectani/Flutter-Simple-Calculator workspace/app
+
+      - name: Upgrade Flutter SDK
+        run: flutter upgrade
 
   test:
     depends-on: setup
@@ -28,8 +32,6 @@ jobs:
       - name: Build APK
         working-directory: workspace/app/flutter_calculator
         run: |
-          flutter clean
-          flutter pub get
           flutter build apk --debug
           mkdir -p /artifacts/apk
           cp build/app/outputs/flutter-apk/app-debug.apk /artifacts/apk/
