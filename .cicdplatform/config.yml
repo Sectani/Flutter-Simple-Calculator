@@ -28,6 +28,8 @@ jobs:
       - name: Build APK
         working-directory: workspace/app/flutter_calculator
         run: |
+          flutter clean
+          flutter pub get
           flutter build apk --debug
           mkdir -p /artifacts/apk
           cp build/app/outputs/flutter-apk/app-debug.apk /artifacts/apk/
