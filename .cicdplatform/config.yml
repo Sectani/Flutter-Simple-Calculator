@@ -1,0 +1,45 @@
+version: '1.0'
+
+jobs:
+  runs-on: mobile-ci-base:lates
+
+  setup:
+    steps:
+      - name: Clean Workspace
+        run: rm -rf workspace/app
+      - name: Clone Repository
+        run: git clone https://github.com/Sectani/Flutter-Simple-Calculator workspace/app
+
+  test:
+    depends-on: setup
+    steps:
+      - name: Run Flutter Tests
+        working-directory: workspace/app/flutter_calculator
+        run: |
+          if [ -d "test" ] && [ "$(find test -name '*.dart' | wc -l)" -gt 0 ]; then
+            flutter test
+          else
+            echo "No tests found in /test. Skipping test step."
+          fi
+
+  build:
+    depends-on: test
+    steps:
+      - name: Build APK
+        working-directory: workspace/app/flutter_calculator
+        run: |
+          flutter build apk --debug
+          mkdir -p /artifacts/apk
+          cp build/app/outputs/flutter-apk/app-debug.apk /artifacts/apk/
+
+  deploy:
+    depends-on: build
+    steps:
+      - name: Deploy with Fastlane (optional)
+        working-directory: workspace/app/flutter_calculator
+        run: |
+          if [ -f "fastlane/Fastfile" ]; then
+            fastlane android deploy
+          else
+            echo "No Fastlane config found"
+          fi
